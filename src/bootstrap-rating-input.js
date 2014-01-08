@@ -5,17 +5,17 @@
     var element;
 
     // A private function to highlight a star corresponding to a given value
-    function _paintValue(ratingInput, value) {
+    function _paintValue(ratingInput, value, glyphEmpty, glyphFull) {
       var selectedStar = $(ratingInput).find('[data-value=' + value + ']');
-      selectedStar.removeClass('glyphicon-star-empty').addClass('glyphicon-star');
-      selectedStar.prevAll('[data-value]').removeClass('glyphicon-star-empty').addClass('glyphicon-star');
-      selectedStar.nextAll('[data-value]').removeClass('glyphicon-star').addClass('glyphicon-star-empty');
+      selectedStar.removeClass(glyphEmpty).addClass(glyphFull);
+      selectedStar.prevAll('[data-value]').removeClass(glyphEmpty).addClass(glyphFull);
+      selectedStar.nextAll('[data-value]').removeClass(glyphFull).addClass(glyphEmpty);
     }
 
     // A private function to remove the selected rating
-    function _clearValue(ratingInput) {
+    function _clearValue(ratingInput, glyphEmpty, glyphFull) {
       var self = $(ratingInput);
-      self.find('[data-value]').removeClass('glyphicon-star').addClass('glyphicon-star-empty');
+      self.find('[data-value]').removeClass(glyphFull).addClass(glyphEmpty);
       self.find('.rating-clear').hide();
       self.find('input').val('').trigger('change');
     }
@@ -27,13 +27,15 @@
         originalInput = $(this[element]),
         max = originalInput.data('max') || 5,
         min = originalInput.data('min') || 0,
+        glyphFull = originalInput.data('glyph-full') || 'glyphicon-star',
+        glyphEmpty = originalInput.data('glyph-empty') || 'glyphicon-star-empty',
         clearable = originalInput.data('clearable') || null,
         stars = '';
 
       // HTML element construction
       for (i = min; i <= max; i++) {
         // Create <max> empty stars
-        stars += ['<span class="glyphicon glyphicon-star-empty" data-value="', i, '"></span>'].join('');
+        stars += ['<span class="glyphicon ',glyphEmpty,'" data-value="', i, '"></span>'].join('');
       }
       // Add a clear link if clearable option is set
       if (clearable) {
@@ -75,9 +77,9 @@
         var self = $(this);
         var val = self.siblings('input').val();
         if (val) {
-          _paintValue(self.closest('.rating-input'), val);
+          _paintValue(self.closest('.rating-input'), val, glyphEmpty, glyphFull);
         } else {
-          _clearValue(self.closest('.rating-input'));
+          _clearValue(self.closest('.rating-input', glyphEmpty, glyphFull));
         }
       })
       // Set the selected value to the hidden field
